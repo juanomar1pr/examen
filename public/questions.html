@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Preguntas</title>
+  <style>
+    .editable-input {
+      display: none; /* Los campos de entrada estarán ocultos por defecto */
+    }
+    .edit-mode .editable-input {
+      display: inline; /* Mostrar solo cuando esté en modo de edición */
+    }
+    .edit-mode .static-text {
+      display: none; /* Ocultar los valores estáticos en modo de edición */
+    }
+    .edit-mode .save-btn, .edit-mode .delete-btn {
+      display: inline; /* Mostrar los botones de guardar y eliminar solo en modo de edición */
+    }
+    .save-btn, .delete-btn {
+      display: none; /* Los botones de guardar y eliminar están ocultos inicialmente */
+    }
+  </style>
+</head>
+<body>
+  <h1>Lista de Preguntas</h1>
+  <div id="questionsContainer"></div>
+
+  <script>
+    // Hacer la solicitud fetch para obtener las preguntas
+    fetch('/questions')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error al cargar las preguntas');
+        }
+        return response.json();
+      })
+      .then(categories => {
+        const questionsContainer = document.getElementById('questionsContainer');
+        
+        // Iterar a través de las categorías
+        Object.keys(categories).forEach(category => {
+          const categoryDiv = document.createElement('div');
+          categoryDiv.innerHTML = `<h2>${category}</h2>`;
+          
+          // Iterar a través de las preguntas de cada categoría
+          categories[category].forEach(question => {
+            const questionDiv = document.createElement('div');
+            questionDiv.id = `question-${question.id}`; // ID único para cada pregunta
+            
+            questionDiv.innerHTML = `
+              <strong>Pregunta: </strong>
+              <span id="question-text-${question.id}" class="static-text">${question.text}</span>
+              <input type="text" id="question-${question.id}" class="editable-input" value="${question.text}"><br>
+              <label>Respuesta:</label>
+              <span id="answer-text-${question.id}" class="static-text">${question.answer}</span>
+              <input type="text" id="answer-${question.id}" class="editable-input" value="${question.answer}"><br>
+              <label>Opciones (separadas por coma):</label>
+              <span id="options-text-${question.id}" class="static-text">${question.options.join(', ')}</span>
+              <input type="text" id="options-${question.id}" class="editable-input" value="${question.options.join(', ')}"><br>
+              <button onclick="editQuestion(${question.id})">Editar</button>
+              <button onclick="saveChanges(${question.id}, '${category}')" class="save-btn">Guardar cambios</button>
+              <button onclick="deleteQuestion(${question.id}, '${category}')" class="delete-btn">Eliminar</button><br><br>
+            `;
+            categoryDiv.appendChild(questionDiv);
+          });
+
+          questionsContainer.appendChild(categoryDiv);
+        });
+      })
+      .catch(error => {
+        console.error('Error al cargar las preguntas:', error);
+      });
+
+    // Función para habilitar los campos de edición
+    function editQuestion(questionId) {
+      const questionDiv = document.getElementById(`question-${questionId}`);
+      
+      // Activar el modo de edición
+      questionDiv.classList.add('edit-mode');
+    }
+
+    // Función para guardar los cambios de una pregunta
+    function saveChanges(questionId, category) {
+      const questionText = document.getElementById(`question-${questionId}`).value;
+      const answer = document.getElementById(`answer-${questionId}`).value;
+      const options = document.getElementById(`options-${questionId}`).value.split(',').map(opt => opt.trim());
+
+      // Depuración: verificar que los valores no sean undefined
+      console.log(`Guardando cambios para la pregunta ID: ${questionId}`);
+      console.log(`Nuevo texto de pregunta: ${questionText}`);
+      console.log(`Nueva respuesta: ${answer}`);
+      console.log(`Nuevas opciones: ${options}`);
+
+      // Verificar si los valores están definidos antes de enviar
+      if (!questionText || !answer || options.length === 0) {
+        alert('Por favor, complete todos los campos.');
+        return;
+      }
+
+      // Enviar los datos al servidor para actualizar la pregunta
+      fetch(`/update-question/${category}/${questionId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text: questionText, answer, options })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('Pregunta actualizada correctamente');
+          
+          // Actualizar los valores de la pregunta, respuesta y opciones en la vista
+          document.getElementById(`question-text-${questionId}`).innerText = questionText;
+          document.getElementById(`answer-text-${questionId}`).innerText = answer;
+          document.getElementById(`options-text-${questionId}`).innerText = options.join(', ');
+
+          // Después de guardar, desactivar el modo de edición
+          const questionDiv = document.getElementById(`question-${questionId}`);
+          questionDiv.classList.remove('edit-mode');
+        } else {
+          alert('Error al actualizar la pregunta');
+        }
+      })
+      .catch(error => {
+        console.error('Error al guardar los cambios:', error);
+      });
+    }
+
+    // Función para borrar una pregunta
+  function deleteQuestion(category, questionId) {
+  fetch(`http://localhost:3000/delete-question/${category}/${questionId}`, {
+    method: 'DELETE',
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert('Pregunta eliminada correctamente');
+        
+        // Remover la pregunta de la interfaz (HTML)
+        const questionDiv = document.getElementById(`question-${questionId}`);
+        if (questionDiv) {
+          questionDiv.remove();
+        }
+      } else {
+        alert('Error al eliminar la pregunta: ' + data.message);
+      }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+    
+  </script>
+</body>
+</html>

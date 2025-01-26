@@ -1,0 +1,22 @@
+{
+  "usuarios": [
+    {
+      "usuario": "yoyo",
+      "contraseña": "12345",
+      "rol": "usr",
+      "nombre": "Usuario2"
+    },
+    {
+      "usuario": "admin",
+      "contraseña": "12345",
+      "rol": "admin",
+      "nombre": "adUsuario1"
+    },
+    {
+      "usuario": "usr",
+      "contraseña": "12345",
+      "rol": "usr",
+      "nombre": "usuario"
+    }
+  ]
+}

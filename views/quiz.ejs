@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Quiz</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="quiz-container">
+    <h1>Pregunta <%= questionNumber %></h1>
+    <p><%= question.text %></p>
+    <form action="/answer" method="POST">
+      <% question.options.forEach((option) => { %>
+        <label>
+          <input type="radio" name="answer" value="<%= option %>" required />
+          <%= option %>
+        </label><br>
+      <% }) %>
+      <button type="submit">Responder</button>
+    </form>
+  </div>
+</body>
+</html>

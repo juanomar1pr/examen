@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen</title>
+  
+    <style>
+        /* Estilo general */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: #ffffff;
+        }
+
+        h1, h2 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 14px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+
+        text-align: left;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+        #contenedor{
+            background-color: black;
+            text-align: center;
+            padding: 25px;
+
+        }
+          #contenedor2{
+        
+            position: fixed;
+            padding: 25px;
+            
+        }
+      
+      
+    </style>
+</head>
+<body>
+    <h1>Bienvenido, <%= username %>!</h1>
+    <h1>Quiz</h1>
+    <div id="contenedor">
+    <!-- Formulario para seleccionar categoría -->
+    <form id="quizForm" method="GET" action="/quiz">
+        <label for="category">Selecciona una categoría:</label>
+        <select id="category" name="category" required>
+            <!-- Las opciones se añaden dinámicamente -->
+        </select><br>
+        <button type="submit">Iniciar</button><br>
+    </form>
+</div>
+    <script>
+        // Función para cargar categorías desde el servidor
+        function loadCategories() {
+            const categorySelect = document.getElementById('category');
+
+            // Obtener categorías desde el servidor
+            fetch('/categories')
+                .then(response => response.json())
+                .then(categories => {
+                    // Añadir cada categoría al select
+                    categories.forEach(category => {
+                        const option = document.createElement('option');
+                        option.value = category;
+                        option.textContent = category.charAt(0).toUpperCase() + category.slice(1); // Capitalizar
+                        categorySelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error al cargar las categorías:', error));
+        }
+
+        // Redirigir al iniciar el quiz
+        document.getElementById('quizForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevenir el envío del formulario
+
+            const selectedCategory = document.getElementById('category').value;
+            if (!selectedCategory) {
+                alert('Por favor, selecciona una categoría.');
+                return;
+            }
+
+            // Redirigir a la ruta correspondiente con la categoría seleccionada
+            window.location.href = `/quiz?category=${selectedCategory}`;
+        });
+
+        // Cargar categorías cuando se cargue la página
+        document.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+<div id="contenedor2">
+    <form action="/logout" method="POST" style="text-align: center;">
+        <button type="submit" class="btn-logout">Cerrar sesión</button>
+    </form></div>
+</body>
+</html>

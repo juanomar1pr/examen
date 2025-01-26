@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestión de Preguntas</title>
+  <button onclick="location.href='/add'">+</button>
+  <style>
+    /* Estilos básicos para la tabla */
+    body{
+         background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: gray;
+    }
+
+    /* Estilos del Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgb(0,0,0);
+      background-color: rgba(0,0,0,0.4);
+      padding-top: 60px;
+    }
+    .modal-content {
+      background-color: #fefefe;
+      margin: 5% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+    }
+    .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+    }
+    .close:hover,
+    .close:focus {
+      color: black;
+      text-decoration: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Gestión de Preguntas</h2>
+
+  <!-- Mostrar categorías -->
+  <% Object.keys(questions).forEach(category => { %>
+    <h3><%= category %></h3> <!-- Nombre de la categoría -->
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Pregunta</th>
+          <th>Opciones</th>
+          <th>Respuesta</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% questions[category].forEach(question => { %>
+          <tr id="question-<%= category %>-<%= question.id %>">
+            <td><%= question.id %></td>
+            <td class="question-text"><%= question.text %></td>
+            <td>
+              <% question.options.forEach(option => { %>
+                <p><%= option %></p>
+              <% }); %>
+            </td>
+            <td><%= question.answer %></td>
+            <td>
+              <button onclick="deleteQuestion('<%= category %>', <%= question.id %>)">-</button>
+              <button onclick="openEditModal('<%= category %>', <%= question.id %>, '<%= question.text %>', <%= JSON.stringify(question.options) %>, '<%= question.answer %>')">Editar</button>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  <% }); %>
+
+  <!-- Modal para editar pregunta -->
+  <div id="editModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <h3>Editar Pregunta</h3>
+      <form id="editForm">
+        <label for="questionText">Pregunta:</label>
+        <input type="text" id="questionText" name="questionText"><br><br>
+
+        <label for="options">Opciones:</label><br>
+        <div id="optionsContainer"></div>
+        <button type="button" onclick="addOption()">Añadir Opción</button><br><br>
+
+        <label for="answer">Respuesta Correcta:</label>
+        <input type="text" id="answer" name="answer"><br><br>
+
+        <button type="submit">Guardar Cambios</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentCategory, currentId;
+
+    // Abre el modal para editar la pregunta
+    function openEditModal(category, id, questionText, options, answer) {
+      currentCategory = category;
+      currentId = id;
+      document.getElementById('questionText').value = questionText;
+      document.getElementById('answer').value = answer;
+
+      const optionsContainer = document.getElementById('optionsContainer');
+      optionsContainer.innerHTML = ''; // Limpiar opciones previas
+      options.forEach((option, index) => {
+        const optionDiv = document.createElement('div');
+        optionDiv.innerHTML = `
+          <input type="text" value="${option}" name="option-${index}" />
+          <button type="button" onclick="removeOption(this)">Eliminar</button>
+        `;
+        optionsContainer.appendChild(optionDiv);
+      });
+
+      document.getElementById('editModal').style.display = 'block';
+    }
+
+    // Cierra el modal
+    function closeModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Añadir una nueva opción
+    function addOption() {
+      const optionsContainer = document.getElementById('optionsContainer');
+      const optionDiv = document.createElement('div');
+      optionDiv.innerHTML = `
+        <input type="text" name="newOption" />
+        <button type="button" onclick="removeOption(this)">Eliminar</button>
+      `;
+      optionsContainer.appendChild(optionDiv);
+    }
+
+    // Eliminar una opción
+    function removeOption(button) {
+      button.parentElement.remove();
+    }
+
+    // Enviar los cambios al servidor
+    document.getElementById('editForm').onsubmit = function(event) {
+      event.preventDefault();
+
+      const updatedQuestionText = document.getElementById('questionText').value;
+      const updatedAnswer = document.getElementById('answer').value;
+      const updatedOptions = Array.from(document.querySelectorAll('[name^="option-"]'))
+        .map(input => input.value);
+
+      fetch(`/edit-question/${currentCategory}/${currentId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: updatedQuestionText,
+          options: updatedOptions,
+          answer: updatedAnswer,
+        }),
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            alert('Pregunta editada correctamente');
+            // Actualizar la pregunta en la interfaz
+            document.querySelector(`#question-${currentCategory}-${currentId} .question-text`).textContent = updatedQuestionText;
+            document.querySelector(`#question-${currentCategory}-${currentId} td:nth-child(3)`).innerHTML = updatedOptions.join(', ');
+            document.querySelector(`#question-${currentCategory}-${currentId} td:nth-child(4)`).textContent = updatedAnswer;
+            closeModal();
+          } else {
+            alert('Error al editar la pregunta: ' + data.message);
+          }
+        })
+        .catch(error => console.error('Error:', error));
+    };
+
+    // Eliminar la pregunta
+    function deleteQuestion(category, id) {
+      if (confirm('¿Estás seguro de que quieres eliminar esta pregunta?')) {
+        fetch(`/delete-question/${category}/${id}`, {
+          method: 'DELETE',
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              alert('Pregunta eliminada correctamente');
+              // Remover la pregunta de la interfaz
+              document.getElementById(`question-${category}-${id}`).remove();
+            } else {
+              alert('Error al eliminar la pregunta: ' + data.message);
+            }
+          })
+          .catch(error => console.error('Error:', error));
+      }
+    }
+  </script>
+
+</body>
+</html>

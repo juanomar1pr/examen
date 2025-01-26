@@ -1,0 +1,31 @@
+{
+  "Matemáticas": [],
+  "Ciencias": [],
+  "Historia": [],
+  "Español": [],
+  "Ingles": [],
+  "Matemáticas 01": [
+    {
+      "id": 1735528437137,
+      "text": "¿cuanto es 2 + 4 ?",
+      "options": [
+        "4",
+        "6",
+        "3",
+        "2"
+      ],
+      "answer": "6"
+    },
+    {
+      "id": 1735705960937,
+      "text": "Pedro Tiene Tres(3) manzanas y su amig@ le regala dos(2) manzanas ¿cuantas manzanas tiene pepito?",
+      "options": [
+        "8",
+        "2",
+        "5",
+        "2"
+      ],
+      "answer": "5"
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usuarios</title>
+    <style>
+        body{   background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);}
+    </style>
+</head>
+<body>
+    <h1>Lista de Usuarios</h1>
+    <a href="/agregar">Agregar Nuevo Usuario</a>
+    <table border="1">
+        <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Rol</th>
+            <th>Acciones</th>
+        </tr>
+        <% usuarios.forEach(usuario => { %>
+        <tr>
+            <td><%= usuario.usuario %></td>
+            <td><%= usuario.nombre %></td>
+            <td><%= usuario.rol %></td>
+            <td><a href="/editar/<%= usuario.usuario %>">Editar</a></td>
+        </tr>
+        <% }) %>
+    </table>
+</body>
+</html>

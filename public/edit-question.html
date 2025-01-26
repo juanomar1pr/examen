@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar Pregunta</title>
+</head>
+<body>
+  <h1>Editar Pregunta</h1>
+
+  <form id="editForm" method="POST">
+    <label for="question">Pregunta:</label>
+    <input type="text" id="question" name="question" required>
+    
+    <label for="answer">Respuesta:</label>
+    <input type="text" id="answer" name="answer" required>
+    
+    <button type="submit">Actualizar Pregunta</button>
+  </form>
+
+  <script>
+    // Obtener el ID de la pregunta (de la URL)
+    const urlParams = new URLSearchParams(window.location.search);
+    const questionId = urlParams.get('id');
+
+    // Función para cargar los datos de la pregunta en el formulario
+    fetch(`/questions`)
+      .then(response => response.json())
+      .then(data => {
+        const question = data.find(q => q.id == questionId);
+        
+        if (question) {
+          // Rellenar el formulario con los datos de la pregunta
+          document.getElementById('question').value = question.question;
+          document.getElementById('answer').value = question.answer;
+        }
+      })
+      .catch(error => console.error('Error al cargar las preguntas:', error));
+
+    // Enviar los datos actualizados al servidor
+    document.getElementById('editForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const updatedQuestion = document.getElementById('question').value;
+      const updatedAnswer = document.getElementById('answer').value;
+
+      // Enviar los datos actualizados al servidor para actualizar la pregunta
+      fetch(`/update-question/${questionId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `question=${updatedQuestion}&answer=${updatedAnswer}`
+      })
+      .then(response => {
+        if (response.ok) {
+          window.location.href = '/questions';  // Redirigir a la lista de preguntas
+        } else {
+          alert('Error al actualizar la pregunta');
+        }
+      })
+      .catch(error => console.error('Error al actualizar la pregunta:', error));
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Usuario</title>
+  
+</head>
+<body>
+    <h1>Editar Usuario</h1>
+    <form method="POST">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" value="<%= usuario.nombre %>" required><br><br>
+        
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña" value="<%= usuario.contraseña %>" required><br><br>
+        
+        <label for="rol">Rol:</label>
+        <select id="rol" name="rol">
+            <option value="admin" <%= usuario.rol === 'admin' ? 'selected' : '' %>>Admin</option>
+            <option value="usr" <%= usuario.rol === 'usr' ? 'selected' : '' %>>Usuario</option>
+        </select><br><br>
+        
+        <button type="submit">Guardar Cambios</button>
+    </form>
+
+    <form method="POST" action="/eliminar/<%= usuario.usuario %>" onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+        <button type="submit" style="background-color: red; color: white;">Eliminar Usuario</button>
+    </form>
+
+    <a href="/">Volver</a>
+</body>
+</html>

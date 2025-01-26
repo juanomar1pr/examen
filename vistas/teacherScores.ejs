@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puntuaciones de los Estudiantes</title>
+    <style>
+
+body {
+   p {
+    font-size: 5.2em; /* 1.2 veces el tamaño base */
+}
+body {
+    font-size: 16px; /* Tamaño base */
+}
+h1 {
+    font-size: 2rem; /* 2 veces el tamaño base */
+}
+  
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+    
+}
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+            font-size:20px; /* Tamaño base */
+
+        }
+        th {
+            font-size: 25px; /* Tamaño base */
+            background-color: black;
+        }
+        details {
+            margin-top: 5px;
+            font-size: 20px; /* Tamaño base */
+        }
+
+    .correcta {
+        color: green;
+    }
+    .incorrecta {
+        color: red;
+    }
+
+    </style>
+</head>
+<body>
+
+     <button onclick="location.href='/add'">+</button>
+       <button onclick="location.href='/editarusr'">usr+</button>
+  
+  <button onclick="location.href='/editable'">Editar2</button>
+    <h1>Bienvenido, Maestro!</h1>
+
+    <h2>Puntuaciones de los estudiantes</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nombre del Estudiante</th>
+                <th>Puntuación</th>
+                <th>Detalles</th>
+            </tr>
+        </thead>
+        <tbody>
+    <% estudiantes.forEach(estudiante => { %>
+        <tr>
+            <td style="width: 150px"><%= estudiante.username %></td>
+            <td style="width: 25px;"><%= estudiante.puntuacion %></td>
+            <td>
+                <details>
+                    <summary>Ver respuestas</summary>
+                    <ul>
+                        <% estudiante.respuestas.forEach(respuesta => { %>
+                            <li>
+                                <strong>Pregunta:</strong> <%= respuesta.text %><br>
+                                <strong>Tiempo:</strong> <%= respuesta.tiempo %><br>
+                                <strong>Respuesta Correcta:</strong> <%= respuesta.correctAnswer %><br>
+                                <strong>Respuesta Seleccionada:</strong> <%= respuesta.selectedAnswer %><br>
+                                <span class="<%= respuesta.isCorrect ? 'correcta' : 'incorrecta' %>">
+                                    <%= respuesta.isCorrect ? 'Sí' : 'No' %>
+                                </span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                </details>
+               
+            </td>
+           
+        </tr>
+    <% }) %>
+</tbody>
+
+    </table>
+     <!-- Formulario para eliminar el resultado -->
+                <form action="/borrar-todos-los-scores %>" method="POST" style="display:inline;">
+                    <button type="submit" style="background-color: red; color: white;">Borrar</button>
+                </form>
+    <form action="/logout" method="POST" style="text-align: center;">
+        <button type="submit" class="btn-logout">Cerrar sesión</button>
+    </form>
+</body>
+</html>
+
+</html>

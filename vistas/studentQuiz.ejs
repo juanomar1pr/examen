@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz de Estudiante</title>
+    <style>
+        .question {
+    display: none;
+}
+.active {
+    display: block;
+}
+#next-button, #submit-button {
+    margin-top: 20px;
+}
+
+        /* Estilos generales */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 95%;
+            max-width: 700px;
+           
+        }
+
+  .examen {
+            background-color: gray;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            height: 80%;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #333;
+        }
+
+        h1 {
+            font-size: 24px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos del formulario */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .question {
+            margin-bottom: 15px;
+        }
+
+        .question p {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .options label {
+            display: block;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .options input {
+            margin-right: 10px;
+        }
+
+        /* Estilos de los botones */
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* Estilos del botón de elegir nueva categoría */
+        .new-category-btn {
+            background-color: #008CBA;
+            margin-top: 10px;
+        }
+
+        .new-category-btn:hover {
+            background-color: #007bb5;
+        }
+
+        /* Estilos del contador de puntos */
+        .score {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="examen">
+      <h1>Bienvenido, <%= username %>!</h1>
+    <div class="container">
+        <h1>Quiz: <%= category %>!</h1>
+   
+ 
+      
+        
+  <form method="POST" action="/submit-quiz">
+    <% questions.forEach((pregunta, index) => { %>
+        <div class="question" id="question-<%= index %>">
+            <p><%= pregunta.text %></p>
+            <% pregunta.options.forEach((opcion, i) => { %>
+                <label>
+                    <input type="radio" name="question<%= index %>" value="<%= opcion %>">
+                    <%= opcion %>
+                </label><br>
+            <% }) %>
+        </div>
+    <% }) %>
+    <input type="hidden" name="preguntas" value='<%= JSON.stringify(questions) %>' />
+    <input type="hidden" name="tiempo" value='<%= fechaActual.toLocaleString()%>' />
+    <input type="hidden" name="category" value="<%= category %>">
+    <button type="button" id="next-button">Siguiente</button>
+    <button type="submit" id="submit-button" style="display:none;">Enviar</button>
+</form>
+    </div></div>
+    <script>
+    let currentQuestion = 0;
+    const questions = document.querySelectorAll('.question');
+    const nextButton = document.getElementById('next-button');
+    const tiempo = document.getElementById('tiempo');
+    const submitButton = document.getElementById('submit-button');
+
+    function showQuestion(index) {
+        questions.forEach((question, i) => {
+            question.classList.remove('active');
+            if (i === index) {
+                question.classList.add('active');
+            }
+        });
+    }
+
+    nextButton.addEventListener('click', () => {
+        if (currentQuestion < questions.length - 1) {
+            currentQuestion++;
+            showQuestion(currentQuestion);
+        }
+        if (currentQuestion === questions.length - 1) {
+            nextButton.style.display = 'none';
+            submitButton.style.display = 'inline-block';
+        }
+    });
+
+    // Inicializar mostrando la primera pregunta
+    showQuestion(currentQuestion);
+</script>
+
+</body>
+</html>

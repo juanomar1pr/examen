@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Añadir Pregunta</title>
+  <style>
+    /* Estilos globales */
+    body {
+      font-family: 'Arial', sans-serif;
+     background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #ffffff;
+      color: #333; /* Color de texto oscuro */
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Estilo del contenedor del formulario */
+    .form-container {
+       background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+
+    /* Título */
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #4CAF50; /* Color verde moderno */
+      text-align: center;
+    }
+
+    /* Estilo del formulario */
+    #question-form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      font-size: 16px;
+      font-weight: bold;
+      color: white;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-size: 16px;
+      color: #333;
+      background-color: #f9f9f9;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4CAF50;
+      box-shadow: 0 0 5px rgba(76, 175, 80, 0.5);
+      outline: none;
+    }
+
+    /* Estilo de los botones */
+    button {
+      background-color: #4CAF50;
+      color: white;
+      font-size: 16px;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    button:focus {
+      outline: none;
+    }
+
+    /* Responsividad */
+    @media (max-width: 768px) {
+      .form-container {
+        width: 90%;
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  
+ <div class="form-container">
+  <h1>Añadir</h1>
+
+<form id="question-form">
+<label for="category">Categoría:</label>
+<input type="text" id="category" name="category" list="categoryList" placeholder="Ejemplo: matemáticas" required>
+<datalist id="categoryList">
+  <% categories.forEach(function(category) { %>
+    <option value="<%= category %>">
+  <% }); %>
+</datalist>
+
+  <label for="question">Pregunta:</label>
+  <input type="text" id="question" name="question" placeholder="Escribe la pregunta" required>
+
+  <label>Opciones:</label>
+  <input type="text" class="option" name="options" placeholder="Opción 1" required>
+  <input type="text" class="option" name="options" placeholder="Opción 2" required>
+  <input type="text" class="option" name="options" placeholder="Opción 3">
+  <input type="text" class="option" name="options" placeholder="Opción 4">
+
+  <label for="answer">Respuesta correcta:</label>
+  <input type="text" id="answer" name="answer" placeholder="Escribe la respuesta correcta" required>
+
+  <button type="submit">Enviar</button>
+</form>
+
+<script>
+
+ document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("question-form");
+
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const category = document.getElementById("category").value.trim();
+    const text = document.getElementById("question").value.trim();
+    const options = Array.from(document.querySelectorAll(".option"))
+      .map((input) => input.value.trim())
+      .filter((option) => option !== "");
+    const answer = document.getElementById("answer").value.trim();
+
+    if (!category || !text || options.length < 2 || !answer) {
+      alert("Por favor, completa todos los campos.");
+      return;
+    }
+
+    const questionData = { id: Date.now(), text, options, answer };
+
+    try {
+      const response = await fetch("/api/agregar-pregunta", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ category, questionData }),
+      });
+
+      if (response.ok) {
+        alert("Pregunta añadida correctamente.");
+        form.reset();
+      } else {
+        const result = await response.json();
+        alert(`Error: ${result.message}`);
+      }
+    } catch (error) {
+      alert(`Error de red: ${error.message}`);
+    }
+  });
+});
+
+
+</script>
+
+</body>
+</html>

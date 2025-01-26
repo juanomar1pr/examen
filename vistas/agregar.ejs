@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Usuario</title>
+    <style>
+        body{   background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+    padding: 40px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.18);}
+    </style>
+</head>
+<body>
+    <h1>Agregar Nuevo Usuario</h1>
+    <form method="POST" action="/agregar">
+        <label for="usuario">Usuario:</label>
+        <input type="text" id="usuario" name="usuario" required><br><br>
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" required><br><br>
+
+        <label for="contraseña">Contraseña:</label>
+        <input type="password" id="contraseña" name="contraseña" required><br><br>
+
+        <label for="rol">Rol:</label>
+        <select id="rol" name="rol">
+            <option value="admin">Admin</option>
+            <option value="usr">Usuario</option>
+        </select><br><br>
+
+        <button type="submit">Agregar Usuario</button>
+    </form>
+    <a href="/editarusr">Volver</a>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Añadir Pregunta</title>
+</head>
+<body>
+  <h1>Añadir Pregunta</h1>
+  <form id="addQuestionForm">
+    <label for="category">Categoría:</label>
+    <select id="category" name="category">
+      <option value="math">Matemáticas</option>
+      <option value="science">Ciencia</option>
+      <option value="new">Nueva categoría</option>
+    </select>
+    <div id="newCategoryInput" style="display: none;">
+      <label for="newCategory">Nombre de la nueva categoría:</label>
+      <input type="text" id="newCategory" name="newCategory" placeholder="Escribe una nueva categoría">
+    </div>
+    <br><br>
+    <label for="text">Pregunta:</label>
+    <input type="text" id="text" name="text" required>
+    <br><br>
+    <label for="options">Opciones (separadas por comas):</label>
+    <input type="text" id="options" name="options" required>
+    <br><br>
+    <label for="answer">Respuesta correcta:</label>
+    <input type="text" id="answer" name="answer" required>
+    <br><br>
+    <button type="submit">Añadir Pregunta</button>
+  </form>
+
+  <script>
+    // Mostrar/ocultar campo de nueva categoría
+    const categorySelect = document.getElementById("category");
+    const newCategoryInput = document.getElementById("newCategoryInput");
+
+    categorySelect.addEventListener("change", () => {
+      if (categorySelect.value === "new") {
+        newCategoryInput.style.display = "block";
+      } else {
+        newCategoryInput.style.display = "none";
+      }
+    });
+
+    // Manejar el envío del formulario
+    const form = document.getElementById("addQuestionForm");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Obtener los valores del formulario
+      const category = categorySelect.value === "new"
+        ? document.getElementById("newCategory").value.trim()
+        : categorySelect.value;
+
+      const text = document.getElementById("text").value.trim();
+      const options = document.getElementById("options").value.split(",").map(opt => opt.trim());
+      const answer = document.getElementById("answer").value.trim();
+
+      // Validar los campos
+      if (!category || !text || !options.length || !answer) {
+        alert("Por favor, completa todos los campos.");
+        return;
+      }
+
+      // Enviar datos al servidor
+      const response = await fetch(`/add-question/${category}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text, options, answer }),
+      });
+
+      const result = await response.json();
+      if (response.ok) {
+        alert("Pregunta añadida correctamente.");
+        form.reset();
+      } else {
+        alert(`Error: ${result.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
